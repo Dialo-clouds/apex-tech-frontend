@@ -14,12 +14,12 @@ export default function TiltCard({ children, className, onClick }: { children: R
     const centerY = rect.height / 2;
     const rotateXValue = ((y - centerY) / centerY) * -10;
     const rotateYValue = ((x - centerX) / centerX) * 10;
-    cardRef.current.style.transform = perspective(1000px) rotateX(deg) rotateY(deg) scale3d(1.05, 1.05, 1.05);
+    cardRef.current.style.transform = `perspective(1000px) rotateX(${rotateXValue}deg) rotateY(${rotateYValue}deg) scale3d(1.05, 1.05, 1.05)`;
   };
 
   const handleMouseLeave = () => {
     if (!cardRef.current) return;
-    cardRef.current.style.transform = perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1);
+    cardRef.current.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
     setIsHovered(false);
   };
 
@@ -30,10 +30,10 @@ export default function TiltCard({ children, className, onClick }: { children: R
       onMouseLeave={handleMouseLeave}
       onMouseEnter={() => setIsHovered(true)}
       onClick={onClick}
-      className={elative overflow-hidden rounded-2xl transition-all duration-300 ease-out cursor-pointer }
+      className={`relative overflow-hidden rounded-2xl transition-all duration-300 ease-out cursor-pointer ${className}`}
     >
       {children}
-      <div className={bsolute inset-0 bg-black/40 transition-opacity duration-500 pointer-events-none } />
+      <div className={`absolute inset-0 bg-black/40 transition-opacity duration-500 pointer-events-none ${isHovered ? 'opacity-0' : 'opacity-100'}`} />
     </div>
   );
 }
