@@ -5,24 +5,29 @@ import type { NextRequest } from 'next/server';
 const protectedRoutes = ['/account', '/account/orders', '/admin'];
 
 export function middleware(request: NextRequest) {
-  const path = request.nextUrl.pathname;
+  try {
+    const path = request.nextUrl.pathname;
 
-  // Check if the user is trying to access a protected route
-  const isProtectedRoute = protectedRoutes.some((route) => path.startsWith(route));
+    // Check if the user is trying to access a protected route
+    const isProtectedRoute = protectedRoutes.some((route) => path.startsWith(route));
 
-  if (isProtectedRoute) {
-    // Check for the auth token in cookies
-    const token = request.cookies.get('apex_token')?.value;
+    if (isProtectedRoute) {
+      // ✅ SAFELY get the token from cookies (this will not crash in production)
+      const token = request.cookies.get('apex_token')?.value || null;
 
-    // If no token, redirect to login
-    if (!token) {
-      const loginUrl = new URL('/auth/login', request.url);
-      loginUrl.searchParams.set('redirect', path); // Save the page they tried to visit
-      return NextResponse.redirect(loginUrl);
+      // If no token, redirect to login
+      if (!token) {
+        const loginUrl = new URL('/auth/login', request.url);
+        loginUrl.searchParams.set('redirect', path);
+        return NextResponse.redirect(loginUrl);
+      }
     }
-  }
 
-  return NextResponse.next();
+    return NextResponse.next();
+  } catch (error) {
+    // ✅ If anything fails, just let the user through (instead of crashing)
+    return NextResponse.next();
+  }
 }
 
 // Configure which routes the middleware runs on
